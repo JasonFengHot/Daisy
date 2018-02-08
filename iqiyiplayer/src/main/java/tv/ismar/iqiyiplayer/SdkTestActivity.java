@@ -756,8 +756,8 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         //debug code
         extraParams.setInitPlayerSdkAfter(0);  //SDK初始化在调用initialize之后delay一定时间开始执行, 单位为毫秒.
         extraParams.setCustomerAppVersion("1");      //传入客户App版本号
-        extraParams.setDeviceId("sh_dvhxt5rk");   //传入deviceId, VIP项目必传, 登录和鉴权使用
-        extraParams.setDeviceInfo("yt-x703l");
+        extraParams.setDeviceId("hu_inz5c93t");   //传入deviceId, VIP项目必传, 登录和鉴权使用
+        extraParams.setDeviceInfo("alp-al00");
         extraParams.setShowAdCountDown(true);
 
         extraParams.addAdsHint(Parameter.HINT_TYPE_SKIP_AD, "下");
@@ -796,7 +796,7 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         }
         LogUtils.setDebug(true);
         //login, 同步操作, 有网络接口调用, 可能耗时, 请注意. 初始只需调用一次, 登录成功后一直有效, 如需登出, 请调用logout
-        Log.d(TAG,"login:" + PlayerSdk.getInstance().login("ec625b4f863d5217f427242538a8b1211f4b4c6beb2d52887355fbb862f47cfa"));
+        Log.d(TAG,"login:" + PlayerSdk.getInstance().login("301efcca5eb1843e720fcc275629cac4eb062db081720287e11b1e7f2c8a62e7"));
         startPlayMovie(mPlaylistManager.getCurrent());
         Map<String, Object> extra = new HashMap<String, Object>();
         String[] params = data.split(":");
