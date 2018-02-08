@@ -86,4 +86,5 @@ dependencies {
     implementation project(':exoplayer-library-ui')
     implementation project(':exoplayer-library-smoothstreaming')
     implementation project(':iqiyiplayer')
+    implementation project(':slidingmenu')
 }

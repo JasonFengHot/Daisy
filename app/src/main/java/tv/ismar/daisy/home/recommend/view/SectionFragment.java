@@ -35,7 +35,7 @@ import tv.ismar.daisy.bean.TvSectionListBean;
 
 public class SectionFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
-    private TvSectionBean mTvSectionBean;
+//    private TvSectionBean mTvSectionBean;
     private TvSectionListBean mTvSectionListBean;
 
     private RecyclerView mRecyclerView;
@@ -77,7 +77,7 @@ public class SectionFragment extends Fragment {
                 .subscribe(new BaseObserver<TvSectionBean>() {
                     @Override
                     public void onSuccess(TvSectionBean tvSectionBean) {
-                        mTvSectionBean = tvSectionBean;
+//                        mTvSectionBean = tvSectionBean;
                         // Set the adapter
                         Context context = mRecyclerView.getContext();
                         mRecyclerView.setLayoutManager(new LinearLayoutManager(context));

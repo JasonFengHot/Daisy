@@ -1,4 +1,4 @@
-include ':app', ':iqiyiplayer'
+include ':app', ':iqiyiplayer', ':slidingmenu'
 include ':viewpagerindicator'
 gradle.ext.exoplayerRoot = 'C:\\Users\\huibin\\AndroidStudioProjects\\ExoPlayer'
 gradle.ext.exoplayerModulePrefix = 'exoplayer-'

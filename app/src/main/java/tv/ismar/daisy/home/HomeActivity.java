@@ -41,7 +41,7 @@ public class HomeActivity extends BaseActivity implements SectionFragment.OnList
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     if (fragment == null || !(fragment instanceof RecommendFragment)) {
-                        transaction.replace(R.id.fragment, RecommendFragment.newInstance(mTvChannelsBeans.get(0))).commit();
+                        transaction.replace(R.id.fragment, RecommendFragment.newInstance(mTvChannelsBeans)).commit();
                     }
                     return true;
                 case R.id.navigation_dashboard:
@@ -79,7 +79,7 @@ public class HomeActivity extends BaseActivity implements SectionFragment.OnList
                         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                         Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment);
                         if (fragment == null || !(fragment instanceof RecommendFragment)) {
-                            transaction.replace(R.id.fragment, RecommendFragment.newInstance(tvChannelsBeans.get(0))).commit();
+                            transaction.replace(R.id.fragment, RecommendFragment.newInstance(tvChannelsBeans)).commit();
                         }
                     }
 
