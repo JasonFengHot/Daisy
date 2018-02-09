@@ -78,6 +78,15 @@ public class ActiveServiceManager {
         }
     }
 
+    public String getZDeviceToken() {
+        String zDeviceToken = SPUtils.getInstance().getString("zdevice_token");
+        if (TextUtils.isEmpty(zDeviceToken)) {
+            return securityActive().getZdevice_token();
+        } else {
+            return zDeviceToken;
+        }
+    }
+
     public String getAuthToken() {
 //        String authToken = SPUtils.getInstance().getString("auth_token");
 //        if (TextUtils.isEmpty(authToken)) {
@@ -122,6 +131,7 @@ public class ActiveServiceManager {
                     fingerprint, apiVersion, deviceInfo, wifiMac, wiredMac).execute().body();
             SPUtils.getInstance().put("api_domain", bean.getDomain(), true);
             SPUtils.getInstance().put("device_token", bean.getDevice_token(), true);
+            SPUtils.getInstance().put("zdevice_token", bean.getZdevice_token(), true);
             return bean;
 
         } catch (IOException e) {

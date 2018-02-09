@@ -26,12 +26,18 @@ public class ClipBean {
     private String _$4k;
     private String m3u8;
 
-    /** 爱奇艺 */
+    /**
+     * 爱奇艺
+     */
     private String iqiyi_4_0;
-    /** 是否爱奇艺会员 */
+    /**
+     * 是否爱奇艺会员
+     */
     private boolean is_vip;
-    /** 奇艺2.1SDK需要新传入字段 */
-    private boolean is_drm;
+    /**
+     * 奇艺2.1SDK需要新传入drm字段
+     */
+    private String drm;
 
     public String getIqiyi_4_0() {
         return iqiyi_4_0;
@@ -49,12 +55,12 @@ public class ClipBean {
         this.is_vip = is_vip;
     }
 
-    public boolean isIs_drm() {
-        return is_drm;
+    public String getDrm() {
+        return drm;
     }
 
-    public void setIs_drm(boolean is_drm) {
-        this.is_drm = is_drm;
+    public void setDrm(String drm) {
+        this.drm = drm;
     }
 
     public String getMedium() {

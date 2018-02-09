@@ -11,7 +11,7 @@ import com.bumptech.glide.module.AppGlideModule;
 public class DaisyAppGlideModule extends AppGlideModule {
   @Override
   public void applyOptions(Context context, GlideBuilder builder) {
-    int memoryCacheSizeBytes = 1024 * 1024 * 20; // 20mb
+    int memoryCacheSizeBytes = 1024 * 1024 * 100; // 20mb
     builder.setMemoryCache(new LruResourceCache(memoryCacheSizeBytes));
   }
 }

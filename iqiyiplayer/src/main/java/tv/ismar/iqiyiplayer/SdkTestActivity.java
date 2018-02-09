@@ -1,6 +1,5 @@
 package tv.ismar.iqiyiplayer;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Surface;
@@ -28,6 +28,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.qiyi.sdk.player.AdItem.AdType;
 import com.qiyi.sdk.player.BitStream;
 import com.qiyi.sdk.player.IAdController;
@@ -52,6 +53,7 @@ import com.qiyi.sdk.player.PlayerSdk.OnInitializedListener;
 import com.qiyi.sdk.player.SdkVideo;
 import com.qiyi.sdk.player.VideoRatio;
 import com.qiyi.sdk.player.constants.SdkConstants;
+import com.qiyi.tvapi.type.DrmType;
 import com.qiyi.video.utils.LogUtils;
 
 import java.util.ArrayList;
@@ -67,6 +69,7 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
     private static final int MSG_PLAY_TIME = 101;
     private static final int MSG_PLAY_NEXT_MOVIE = 102;
     private static final int MSG_RETRY_INIT = 103;
+
     // seek steps                            5s         10s         30s         1m          5m          10m
     private static final int[] SEEK_STEPS = {5000, 10000, 30000, 60000, 300000, 600000};
     private static final HashMap<BitStream, String> BITSTREAM_NAMES;
@@ -412,6 +415,8 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         }
     };
     private String data;
+    private boolean isVip;
+    private String drm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -420,8 +425,10 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         setContentView(R.layout.activity_sdk_test);
 
         Intent intent = getIntent();
-        if (intent != null){
+        if (intent != null) {
             data = intent.getStringExtra("data");
+            isVip = intent.getBooleanExtra("is_vip", false);
+            drm = intent.getStringExtra("drm");
         }
 
         initViews();
@@ -796,14 +803,21 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         }
         LogUtils.setDebug(true);
         //login, 同步操作, 有网络接口调用, 可能耗时, 请注意. 初始只需调用一次, 登录成功后一直有效, 如需登出, 请调用logout
-        Log.d(TAG,"login:" + PlayerSdk.getInstance().login("301efcca5eb1843e720fcc275629cac4eb062db081720287e11b1e7f2c8a62e7"));
+
+        String zDeviceToken = SPUtils.getInstance().getString("zdevice_token");
+        Log.d(TAG, "login:" + PlayerSdk.getInstance().login(zDeviceToken));
         startPlayMovie(mPlaylistManager.getCurrent());
         Map<String, Object> extra = new HashMap<String, Object>();
         String[] params = data.split(":");
         String iqiyiParam1 = params[0];
         String iqiyiParam2 = params[1];
         String iqiyiParam3 = params[2];
-        startPlayMovie(new SdkVideo(iqiyiParam1, iqiyiParam2, true, IMedia.DRM_TYPE_NONE, 0, null));
+        int drmType = DrmType.DRM_NONE;
+        if (!TextUtils.isEmpty(drm) && drm.equals("2")) {
+            drmType = DrmType.DRM_INTERTRUST;
+        }
+
+        startPlayMovie(new SdkVideo(iqiyiParam1, iqiyiParam2, isVip, drmType, 0, null));
 //        startPlayMovie(new SdkVideo("244034600", "244034600", true, IMedia.DRM_TYPE_NONE, 0, null));
 
         //轮播节目播放

@@ -201,6 +201,8 @@ public class PlayActivity extends AppCompatActivity implements PlayContract.View
             Intent intent = new Intent();
             intent.setClass(this, SdkTestActivity.class);
             intent.putExtra("data", iqiyi);
+            intent.putExtra("is_vip", clipBean.isIs_vip());
+            intent.putExtra("drm", clipBean.getDrm());
             startActivity(intent);
         }else {
             UriSample uriSample =
