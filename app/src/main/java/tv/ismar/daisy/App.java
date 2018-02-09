@@ -1,8 +1,10 @@
 package tv.ismar.daisy;
 
 import android.app.Application;
+import android.support.multidex.MultiDex;
 
 import com.blankj.utilcode.util.Utils;
+import com.bumptech.glide.module.AppGlideModule;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -34,9 +36,9 @@ public class App extends Application{
     }
 
     private void initializeAll(){
+        MultiDex.install(this);
         Utils.init(this);
-
-        FormatStrategy formatStrategy = PrettyFormatStrategy.newBuilder()
+         FormatStrategy formatStrategy = PrettyFormatStrategy.newBuilder()
                 .showThreadInfo(false)  // (Optional) Whether to show thread info or not. Default true
                 .methodCount(10)         // (Optional) How many method line to show. Default 2
                 .methodOffset(7)        // (Optional) Hides internal method calls up to offset. Default 5

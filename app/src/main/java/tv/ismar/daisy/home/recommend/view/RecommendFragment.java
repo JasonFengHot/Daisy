@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import java.util.ArrayList;
 import java.util.List;
 
+import tv.ismar.daisy.GlideApp;
 import tv.ismar.daisy.R;
 import tv.ismar.daisy.bean.TvChannelsBean;
 import tv.ismar.daisy.bean.TvSectionListBean;
@@ -32,7 +34,7 @@ import tv.ismar.daisy.home.recommend.presenter.RecommendPresenter;
 import tv.ismar.daisy.home.recommend.viewmodel.RecommendViewModel;
 
 
-public class RecommendFragment extends Fragment implements RecommendContract.View  {
+public class RecommendFragment extends Fragment implements RecommendContract.View {
 
     private ArrayList<TvChannelsBean> mTvChannelsBeans;
 
@@ -75,7 +77,7 @@ public class RecommendFragment extends Fragment implements RecommendContract.Vie
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-         slidingMenu = new SlidingMenu(getContext());
+        slidingMenu = new SlidingMenu(getContext());
         bindSlidingMenu(mTvChannelsBeans, slidingMenu);
         slidingMenu.setMode(SlidingMenu.LEFT);
         slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
@@ -117,31 +119,61 @@ public class RecommendFragment extends Fragment implements RecommendContract.Vie
     @Override
     public void loadSectionList(List<TvSectionListBean> beans) {
         SectionAdapter adapter;
-        if (mBinding.pager.getAdapter() == null){
-             adapter = new SectionAdapter(getChildFragmentManager(), beans);
+//        if (mBinding.pager.getAdapter() == null) {
+            adapter = new SectionAdapter(getChildFragmentManager(), beans);
             mBinding.pager.setAdapter(adapter);
-        }else {
-            adapter = (SectionAdapter) mBinding.pager.getAdapter();
-            adapter.setBeans(beans);
             adapter.notifyDataSetChanged();
-        }
+//        } else {
+//            adapter = (SectionAdapter) mBinding.pager.getAdapter();
+//            adapter.setBeans(beans);
+//            adapter.notifyDataSetChanged();
+//        }
 
         mBinding.pager.setOffscreenPageLimit(1);
         mBinding.indicator.setViewPager(mBinding.pager);
+        mBinding.indicator.notifyDataSetChanged();
+        mBinding.indicator.setCurrentItem(0);
     }
-
 
 
     class SectionAdapter extends FragmentPagerAdapter {
         private List<TvSectionListBean> mBeans;
+        private boolean update = true;
 
         public SectionAdapter(FragmentManager fm, List<TvSectionListBean> beans) {
             super(fm);
+            update = true;
             mBeans = beans;
         }
 
         public void setBeans(List<TvSectionListBean> mBeans) {
+            update = true;
             this.mBeans = mBeans;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container,
+                    position);//得到缓存的fragment
+
+
+//            if (update) {//我这里只需要重新更新第一个fragment
+
+                //得到tag，这点很重要
+                String fragmentTag = fragment.getTag();
+
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                //移除旧的fragment
+                ft.remove(fragment);
+                //换成新的fragment
+                fragment = getItem(position);
+                //添加新fragment时必须用前面获得的tag，这点很重要
+                ft.add(container.getId(), fragment, fragmentTag);
+                ft.attach(fragment);
+                ft.commit();
+                update = false;//清除更新标记（只有重新启动的时候需要去创建新的fragment对象），防止正常情况下频繁创建对象
+//            }
+            return fragment;
         }
 
         @Override
@@ -160,7 +192,7 @@ public class RecommendFragment extends Fragment implements RecommendContract.Vie
         }
     }
 
-    private void bindSlidingMenu(ArrayList<TvChannelsBean> channelsBeans, SlidingMenu slidingMenu){
+    private void bindSlidingMenu(ArrayList<TvChannelsBean> channelsBeans, SlidingMenu slidingMenu) {
         RecyclerView recyclerView = new RecyclerView(getContext());
         slidingMenu.setMenu(recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -169,10 +201,11 @@ public class RecommendFragment extends Fragment implements RecommendContract.Vie
     }
 
 
-    public  class ChannelItemRecyclerViewAdapter extends RecyclerView.Adapter<ChannelItemRecyclerViewAdapter.ViewHolder> {
+    public class ChannelItemRecyclerViewAdapter extends RecyclerView.Adapter<ChannelItemRecyclerViewAdapter.ViewHolder> implements View.OnClickListener {
 
         private final ArrayList<TvChannelsBean> mValues;
         private final Context mContext;
+        private TextView selectedView;
 
         public ChannelItemRecyclerViewAdapter(Context context, ArrayList<TvChannelsBean> items) {
             mContext = context;
@@ -187,31 +220,34 @@ public class RecommendFragment extends Fragment implements RecommendContract.Vie
         }
 
 
-
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mValues.get(position);
 
-            Glide.with(mContext)
+            GlideApp.with(mContext)
                     .load(mValues.get(position).getIcon_url())
                     .into(holder.mImageView);
             holder.mTitleView.setText(mValues.get(position).getName());
             holder.mView.setTag(holder.mItem);
 
-            holder.mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //to-do
-                    mPresenter.fetchSectionList(((TvChannelsBean) v.getTag()).getUrl());
-                }
-            });
+            holder.mView.setOnClickListener(this);
         }
-
 
 
         @Override
         public int getItemCount() {
             return mValues.size();
+        }
+
+        @Override
+        public void onClick(View v) {
+            //to-do
+            if (selectedView!=null){
+                selectedView.setSelected(false);
+            }
+            selectedView = v.findViewById(R.id.textView);
+            selectedView.setSelected(true);
+            mPresenter.fetchSectionList(((TvChannelsBean) v.getTag()).getUrl());
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {

@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import tv.ismar.daisy.BaseObserver;
+import tv.ismar.daisy.GlideApp;
 import tv.ismar.daisy.R;
 import tv.ismar.daisy.SkyService;
 import tv.ismar.daisy.bean.TvSectionBean;
@@ -35,10 +37,11 @@ import tv.ismar.daisy.bean.TvSectionListBean;
 
 public class SectionFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
-//    private TvSectionBean mTvSectionBean;
+    //    private TvSectionBean mTvSectionBean;
     private TvSectionListBean mTvSectionListBean;
 
     private RecyclerView mRecyclerView;
+    private List<Disposable> disposableList = new ArrayList<>();
 
     public static SectionFragment newInstance(TvSectionListBean bean) {
         SectionFragment fragment = new SectionFragment();
@@ -89,6 +92,12 @@ public class SectionFragment extends Fragment {
                     public void onFailure(Throwable e) {
                         Logger.e(e, "fetchSection Throwable");
                     }
+
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        disposableList.add(d);
+                    }
                 });
 
 
@@ -103,6 +112,17 @@ public class SectionFragment extends Fragment {
             throw new RuntimeException(context.toString()
                     + " must implement OnListFragmentInteractionListener");
         }
+    }
+
+    @Override
+    public void onPause() {
+        for (Disposable disposable : disposableList) {
+            if (!disposable.isDisposed()) {
+                disposable.dispose();
+            }
+        }
+        super.onPause();
+
     }
 
     @Override
@@ -146,22 +166,53 @@ public class SectionFragment extends Fragment {
             String horizontalImageUrl = mValues.get(position).getPoster_url();
 
             String targetImageUrl = verticalImageUrl;
-            if (TextUtils.isEmpty(verticalImageUrl) || verticalImageUrl.equals(defaultVerticalUrl)) {
+
+            if (!TextUtils.isEmpty(verticalImageUrl) && !verticalImageUrl.equals(defaultVerticalUrl)) {
+                targetImageUrl = verticalImageUrl;
+            } else if (!TextUtils.isEmpty(vertical2ImageUrl) && !vertical2ImageUrl.equals(defaultVerticalUrl)) {
                 targetImageUrl = vertical2ImageUrl;
-            } else if (TextUtils.isEmpty(vertical2ImageUrl)) {
+            } else if (!TextUtils.isEmpty(horizontalImageUrl) && !horizontalImageUrl.equals(defaultVerticalUrl)) {
                 targetImageUrl = horizontalImageUrl;
             }
 
-            Glide.with(mContext)
+            GlideApp.with(mContext)
                     .load(targetImageUrl)
                     .into(holder.mImageView);
-            holder.mTitleView.setText("电影：" + mValues.get(position).getTitle());
-            holder.mDirector.setText("导演：" + listToString(mValues.get(position).getAttributes().getDirector()));
-            holder.mGenre.setText("类型：" + listToString(mValues.get(position).getAttributes().getGenre()));
-            holder.mAirDate.setText("上映：" + (mValues.get(position).getAttributes().getAir_date()));
-            holder.mActor.setText("演员：" + listToString(mValues.get(position).getAttributes().getActor()));
-            holder.mArea.setText("地区：" + (mValues.get(position).getAttributes().getArea().get(1)));
 
+            try {
+                holder.mTitleView.setText("电影：" + mValues.get(position).getTitle());
+            } catch (NullPointerException e) {
+
+            }
+
+            try {
+                holder.mDirector.setText("导演：" + listToString(mValues.get(position).getAttributes().getDirector()));
+            } catch (NullPointerException e) {
+
+            }
+            try {
+                holder.mGenre.setText("类型：" + listToString(mValues.get(position).getAttributes().getGenre()));
+            } catch (NullPointerException e) {
+
+            }
+
+            try {
+                holder.mAirDate.setText("上映：" + (mValues.get(position).getAttributes().getAir_date()));
+            } catch (NullPointerException e) {
+
+            }
+
+            try {
+                holder.mActor.setText("演员：" + listToString(mValues.get(position).getAttributes().getActor()));
+            } catch (NullPointerException e) {
+
+            }
+
+            try {
+                holder.mArea.setText("地区：" + (mValues.get(position).getAttributes().getArea().get(1)));
+            } catch (NullPointerException e) {
+
+            }
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -176,7 +227,7 @@ public class SectionFragment extends Fragment {
         }
 
         private String listToString(List<List<String>> list) {
-            if (list == null){
+            if (list == null) {
                 return "";
             }
 
