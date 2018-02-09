@@ -78,6 +78,16 @@ public class ActiveServiceManager {
         }
     }
 
+    public String getSnToken() {
+        String snToken = SPUtils.getInstance().getString("sn_token");
+        if (TextUtils.isEmpty(snToken)) {
+            return securityActive().getSn_token();
+        } else {
+            return snToken;
+        }
+    }
+
+
     public String getZDeviceToken() {
         String zDeviceToken = SPUtils.getInstance().getString("zdevice_token");
         if (TextUtils.isEmpty(zDeviceToken)) {
@@ -132,6 +142,7 @@ public class ActiveServiceManager {
             SPUtils.getInstance().put("api_domain", bean.getDomain(), true);
             SPUtils.getInstance().put("device_token", bean.getDevice_token(), true);
             SPUtils.getInstance().put("zdevice_token", bean.getZdevice_token(), true);
+            SPUtils.getInstance().put("sn_token", bean.getSn_token(), true);
             return bean;
 
         } catch (IOException e) {

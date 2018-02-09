@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -763,8 +764,10 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
         //debug code
         extraParams.setInitPlayerSdkAfter(0);  //SDK初始化在调用initialize之后delay一定时间开始执行, 单位为毫秒.
         extraParams.setCustomerAppVersion("1");      //传入客户App版本号
-        extraParams.setDeviceId("hu_inz5c93t");   //传入deviceId, VIP项目必传, 登录和鉴权使用
-        extraParams.setDeviceInfo("alp-al00");
+        String snToken = SPUtils.getInstance().getString("sn_token");
+        extraParams.setDeviceId(snToken);   //传入deviceId, VIP项目必传, 登录和鉴权使用
+
+        extraParams.setDeviceInfo(Build.PRODUCT.replaceAll(" ", "_").toLowerCase());
         extraParams.setShowAdCountDown(true);
 
         extraParams.addAdsHint(Parameter.HINT_TYPE_SKIP_AD, "下");
