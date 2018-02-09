@@ -1,5 +1,6 @@
 package tv.ismar.iqiyiplayer;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -65,7 +65,7 @@ import java.util.Map;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class SdkTestActivity extends AppCompatActivity implements OnClickListener, OnCheckedChangeListener, OnItemSelectedListener {
+public class SdkTestActivity extends Activity implements OnClickListener, OnCheckedChangeListener, OnItemSelectedListener {
     private static final String TAG = "SdkTestActivity";
     private static final int MSG_PLAY_TIME = 101;
     private static final int MSG_PLAY_NEXT_MOVIE = 102;
@@ -232,6 +232,42 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
             showToast(text);
         }
     };
+    private String data;
+    private boolean isVip;
+    private String drm;
+    private Handler mHandler = new Handler(Looper.getMainLooper()) {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_PLAY_TIME:
+                    String playTime;
+                    int curPos = mPlayer.getCurrentPosition();
+                    int duration = mPlayer.getDuration();
+                    Log.d(TAG, "MSG_PLAY_TIME: curPos=" + curPos + ", duration=" + duration);
+                    playTime = getPlaybackTimeString(curPos);
+                    playTime += " / ";
+                    playTime += getPlaybackTimeString(duration);
+                    Log.d(TAG, "MSG_PLAY_TIME: time string=" + playTime);
+                    mTxtPlayTime.setText(playTime);
+                    final int max = mProgressBar.getMax();
+                    int progress = Math.round(((float) curPos / duration) * max);
+                    int secondaryProgress = mPlayer.getCachePercent() * max / 100;
+                    mProgressBar.setProgress(progress);
+                    mProgressBar.setSecondaryProgress(secondaryProgress);
+                    sendEmptyMessageDelayed(MSG_PLAY_TIME, 1000);
+                    Log.d(TAG, "MSG_PLAY_TIME: isPlaying=" + mPlayer.isPlaying());
+                    break;
+                case MSG_PLAY_NEXT_MOVIE:
+                    mPlaylistManager.moveToNext();
+                    startPlayMovie(mPlaylistManager.getCurrent());
+                    break;
+
+                case MSG_RETRY_INIT:
+                    initQiyiPlayerSdk();
+                default:
+                    break;
+            }
+        }
+    };
     private OnStateChangedListener mStateChangedListener = new OnStateChangedListener() {
         @Override
         public boolean onError(IMediaPlayer player, ISdkError error) {
@@ -382,42 +418,6 @@ public class SdkTestActivity extends AppCompatActivity implements OnClickListene
             });
         }
     };
-    private Handler mHandler = new Handler(Looper.getMainLooper()) {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_PLAY_TIME:
-                    String playTime;
-                    int curPos = mPlayer.getCurrentPosition();
-                    int duration = mPlayer.getDuration();
-                    Log.d(TAG, "MSG_PLAY_TIME: curPos=" + curPos + ", duration=" + duration);
-                    playTime = getPlaybackTimeString(curPos);
-                    playTime += " / ";
-                    playTime += getPlaybackTimeString(duration);
-                    Log.d(TAG, "MSG_PLAY_TIME: time string=" + playTime);
-                    mTxtPlayTime.setText(playTime);
-                    final int max = mProgressBar.getMax();
-                    int progress = Math.round(((float) curPos / duration) * max);
-                    int secondaryProgress = mPlayer.getCachePercent() * max / 100;
-                    mProgressBar.setProgress(progress);
-                    mProgressBar.setSecondaryProgress(secondaryProgress);
-                    sendEmptyMessageDelayed(MSG_PLAY_TIME, 1000);
-                    Log.d(TAG, "MSG_PLAY_TIME: isPlaying=" + mPlayer.isPlaying());
-                    break;
-                case MSG_PLAY_NEXT_MOVIE:
-                    mPlaylistManager.moveToNext();
-                    startPlayMovie(mPlaylistManager.getCurrent());
-                    break;
-
-                case MSG_RETRY_INIT:
-                    initQiyiPlayerSdk();
-                default:
-                    break;
-            }
-        }
-    };
-    private String data;
-    private boolean isVip;
-    private String drm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
