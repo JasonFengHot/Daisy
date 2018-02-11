@@ -806,7 +806,7 @@ public class SdkTestActivity extends Activity implements OnClickListener, OnChec
         }
         LogUtils.setDebug(true);
         //login, 同步操作, 有网络接口调用, 可能耗时, 请注意. 初始只需调用一次, 登录成功后一直有效, 如需登出, 请调用logout
-
+        PlayerSdk.getInstance().logout();
         String zDeviceToken = SPUtils.getInstance().getString("zdevice_token");
         Log.d(TAG, "login:" + PlayerSdk.getInstance().login(zDeviceToken));
         startPlayMovie(mPlaylistManager.getCurrent());
