@@ -10,11 +10,15 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.Url;
 import tv.ismar.daisy.bean.ClipBean;
 import tv.ismar.daisy.bean.ItemBean;
+import tv.ismar.daisy.bean.QiyiCheckBean;
 import tv.ismar.daisy.bean.TvChannelsBean;
 import tv.ismar.daisy.bean.TvSectionBean;
 import tv.ismar.daisy.bean.TvSectionListBean;
@@ -52,12 +56,20 @@ public interface SkyService {
             @Query("code") String code
     );
 
+    @FormUrlEncoded
+    @POST
+    Observable<QiyiCheckBean> apiQiyiCheck(
+            @Field("verify_code") String qiyiCode
+    );
+
     class ServiceManager {
         private static final String SKY_HOST = "http://1.1.1.1/";
+        private static final String CARNAITION_HOST = "http://1.1.1.6/";
 
         private static ServiceManager mInstance;
 
         private SkyService mSkyHostService;
+        private SkyService mCarnationHostService;
 
 
         public ServiceManager() {
@@ -78,6 +90,14 @@ public interface SkyService {
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                     .build();
 
+            Retrofit carnationRetrofit = new Retrofit.Builder()
+                    .client(client)
+                    .baseUrl(CARNAITION_HOST)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .build();
+
+            mCarnationHostService = carnationRetrofit.create(SkyService.class);
             mSkyHostService = retrofit.create(SkyService.class);
         }
 
@@ -93,6 +113,9 @@ public interface SkyService {
         }
 
         public SkyService getSkyHostService() {
+            return mSkyHostService;
+        }
+        public SkyService getCarnationHostService() {
             return mSkyHostService;
         }
     }

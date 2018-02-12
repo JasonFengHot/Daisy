@@ -5,8 +5,13 @@ import android.text.TextUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import io.reactivex.Observer;
+import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okio.BufferedSink;
 import okio.Okio;
@@ -14,6 +19,7 @@ import tv.ismar.daisy.BaseObserver;
 import tv.ismar.daisy.SkyService;
 import tv.ismar.daisy.bean.ClipBean;
 import tv.ismar.daisy.bean.ItemBean;
+import tv.ismar.daisy.bean.QiyiCheckBean;
 import tv.ismar.daisy.player.PlayContract;
 
 /**
@@ -118,5 +124,37 @@ public class PlayPresenter implements PlayContract.Presenter {
             e.printStackTrace();
         }
         return clipEntity;
+    }
+
+    public void checkQiyi(String code){
+        String[] params = code.split(":");
+        String iqiyiParam1 = params[0];
+        String iqiyiParam2 = params[1];
+        String iqiyiParam3 = params[2];
+        SkyService.ServiceManager.getInstance().getCarnationHostService()
+                .apiQiyiCheck(iqiyiParam1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<QiyiCheckBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(QiyiCheckBean qiyiCheckBean) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 }

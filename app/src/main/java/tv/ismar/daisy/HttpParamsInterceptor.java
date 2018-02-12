@@ -254,9 +254,9 @@ public class HttpParamsInterceptor implements Interceptor {
 //            case "1.1.1.4":
 //                domain = appendProtocol(IsmartvActivator.getInstance().getLogDomain());
 //                break;
-//            case "1.1.1.6":
-//                domain = appendProtocol(IsmartvActivator.getInstance().getCarnationDomain());
-//                break;
+            case "1.1.1.6":
+                domain = appendProtocol(ActiveServiceManager.getInstance().getCarnationDomain());
+                break;
             default:
                 return;
         }
