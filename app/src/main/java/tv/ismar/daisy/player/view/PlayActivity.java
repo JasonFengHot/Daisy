@@ -198,7 +198,6 @@ public class PlayActivity extends AppCompatActivity implements PlayContract.View
     public void startPlay(ClipBean clipBean) {
         if (!TextUtils.isEmpty(clipBean.getIqiyi_4_0())) {
             String iqiyi = clipBean.getIqiyi_4_0();
-            mPresenter.checkQiyi(iqiyi);
             Intent intent = new Intent();
             intent.setClass(this, SdkTestActivity.class);
             intent.putExtra("data", iqiyi);

@@ -6,6 +6,7 @@ import java.util.List;
 import io.reactivex.Observable;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -57,7 +58,15 @@ public interface SkyService {
     );
 
     @FormUrlEncoded
-    @POST
+    @POST("api/play/check/")
+    Observable<ResponseBody> apiPlayCheck(
+            @Field("item") String item,
+            @Field("package") String pkg,
+            @Field("subitem") String subItem
+    );
+
+    @FormUrlEncoded
+    @POST("api/check/")
     Observable<QiyiCheckBean> apiQiyiCheck(
             @Field("verify_code") String qiyiCode
     );
@@ -116,7 +125,7 @@ public interface SkyService {
             return mSkyHostService;
         }
         public SkyService getCarnationHostService() {
-            return mSkyHostService;
+            return mCarnationHostService;
         }
     }
 }
