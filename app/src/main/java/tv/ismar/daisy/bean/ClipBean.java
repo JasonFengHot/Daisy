@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 
 import com.google.gson.annotations.SerializedName;
+import com.orhanobut.logger.Logger;
 
 import tv.ismar.daisy.active.ActiveServiceManager;
 import tv.ismar.daisy.active.SkyAESTool;
@@ -145,9 +146,10 @@ public class ClipBean {
 
     private String decryptionClipUrl(String url) {
         if (!TextUtils.isEmpty(url)) {
-
-            return SkyAESTool.decrypt(
+            String targetUrl = SkyAESTool.decrypt(
                     ActiveServiceManager.getInstance().getDeviceToken().substring(0, 16), Base64.decode(url, Base64.URL_SAFE));
+            Logger.t("ClipBean").d("m3u8 url: " + targetUrl);
+            return targetUrl;
         }
         return null;
     }
