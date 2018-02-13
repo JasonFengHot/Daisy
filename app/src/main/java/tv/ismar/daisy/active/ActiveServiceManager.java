@@ -140,6 +140,7 @@ public class ActiveServiceManager {
             SecurityActiveBean bean = activeService.trustSecurityActive(sn, manufacture, kind, appVersion, sign,
                     fingerprint, apiVersion, deviceInfo, wifiMac, wiredMac).execute().body();
             SPUtils.getInstance().put("api_domain", bean.getDomain(), true);
+            SPUtils.getInstance().put("carnation_domain", bean.getCarnation(), true);
             SPUtils.getInstance().put("device_token", bean.getDevice_token(), true);
             SPUtils.getInstance().put("zdevice_token", bean.getZdevice_token(), true);
             SPUtils.getInstance().put("sn_token", bean.getSn_token(), true);
@@ -209,6 +210,15 @@ public class ActiveServiceManager {
         } catch (Exception e) {
             Logger.e(e, "GetSign Exception");
             return encryptWithRSA(key, getLicence());
+        }
+    }
+
+    public String getCarnationDomain() {
+        String carnationDomain = SPUtils.getInstance().getString("carnation_domain");
+        if (TextUtils.isEmpty(carnationDomain)) {
+            return securityActive().getCarnation();
+        } else {
+            return carnationDomain;
         }
     }
 
